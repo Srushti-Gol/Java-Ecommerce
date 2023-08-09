@@ -1,0 +1,305 @@
+package controller;
+
+import java.io.IOException;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.jboss.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import model.*;
+import service.*;
+
+@Controller
+@RequestMapping(value = "/Product")
+public class ProductController {
+
+	private static final Logger logger = Logger
+			.getLogger(UserController.class);
+	
+	public ProductController() {
+		System.out.println("ProductController()");
+	}
+	
+	@Autowired
+	private LaptopService laptopService;
+	
+	@Autowired
+	private MobileService mobileService;
+	@Autowired
+	private TVService tvService;
+	@Autowired
+	private SmartWatchService smartwatchService;
+	
+	@Autowired
+	private ProductService productService;
+		
+	@RequestMapping(value = "/laptop")
+	public ModelAndView listLaptop(ModelAndView model, HttpServletRequest request) throws IOException {
+		HttpSession session = request.getSession();
+		if(session.getAttribute("uid") != null) {
+			List<Laptop> listLaptop = laptopService.getAllLaptops();
+			model.addObject("listLaptop", listLaptop);
+			model.setViewName("laptop");
+		}
+		else {
+			return new ModelAndView("redirect:/");
+		}
+		
+		return model;
+	}
+	
+	
+	
+	@RequestMapping(value = "/mobile")
+	public ModelAndView listmobile(ModelAndView model, HttpServletRequest request) throws IOException {
+		HttpSession session = request.getSession();
+		if(session.getAttribute("uid") != null) {
+			List<Mobile> listMobile = mobileService.getAllMobiles();
+			model.addObject("listMobile", listMobile);
+			model.setViewName("mobile");
+		}
+		else {
+			return new ModelAndView("redirect:/");
+		}
+		return model;
+	}
+	
+	@RequestMapping(value = "/tv")
+	public ModelAndView listTv(ModelAndView model, HttpServletRequest request) throws IOException {
+		HttpSession session = request.getSession();
+		if(session.getAttribute("uid") != null) {
+			List<TV> listTV = tvService.getAllTVs();
+			model.addObject("listTV", listTV);
+			model.setViewName("tv");
+		}
+		else {
+			return new ModelAndView("redirect:/");
+		}
+		return model;
+	}
+	
+	@RequestMapping(value = "/smartwatch")
+	public ModelAndView listSmartWatch(ModelAndView model, HttpServletRequest request) throws IOException {
+		HttpSession session = request.getSession();
+		if(session.getAttribute("uid") != null) {
+			List<SmartWatch> listSmartWatch = smartwatchService.getAllSmartWatchs();
+			model.addObject("listSmartWatch", listSmartWatch);
+			model.setViewName("smartwatch");
+		}
+		else {
+			return new ModelAndView("redirect:/");
+		}
+		
+		return model;
+	}
+	
+	
+	
+	@RequestMapping(value = "/inventory")
+	public ModelAndView listInventory(ModelAndView model, HttpServletRequest request) throws IOException {
+		HttpSession session = request.getSession();
+		if(session.getAttribute("uid") != null) {
+			List<Laptop> listLaptop = laptopService.getAllLaptops();
+			List<Mobile> listMobile = mobileService.getAllMobiles();
+			List<TV> listTV = tvService.getAllTVs();
+			List<SmartWatch> listSmartWatch = smartwatchService.getAllSmartWatchs();
+			model.addObject("listLaptop", listLaptop);
+			model.addObject("listMobile", listMobile);
+			model.addObject("listTV", listTV);
+			model.addObject("listSmartWatch", listSmartWatch);
+			model.setViewName("inventory");
+		}
+		else {
+			return new ModelAndView("redirect:/");
+		}
+		
+		return model;
+	}
+
+	@RequestMapping(value = "/newLaptop", method = RequestMethod.GET)
+	public ModelAndView newLaptop(ModelAndView model) {
+		Laptop laptop = new Laptop();
+		model.addObject("laptop", laptop);
+		model.setViewName("LaptopForm");
+		return model;
+	}
+	
+	@RequestMapping(value = "/saveLaptop", method = RequestMethod.POST)
+	public ModelAndView saveEmployee(@ModelAttribute Laptop laptop) {
+		if (laptop.getP_Id() == 0) { // if employee id is 0 then creating the
+			// employee other updating the employee
+			laptopService.addLaptop(laptop);
+			return new ModelAndView("redirect:/Product/laptop");
+		} else {
+			laptopService.updateLaptop(laptop);
+			return new ModelAndView("redirect:/Product/laptop");
+		}
+	}
+	
+	@RequestMapping(value = "/editLaptop")
+	public ModelAndView editLaptop(HttpServletRequest request) {
+		int pId = Integer.parseInt(request.getParameter("id"));
+		Laptop laptop = laptopService.getLaptop(pId);
+		ModelAndView model = new ModelAndView("LaptopForm");
+		model.addObject("laptop", laptop);
+
+		return model;
+	}
+	
+	@RequestMapping(value = "/deleteLaptop")
+	public ModelAndView deleteEmployee(HttpServletRequest request) {
+		int pId = Integer.parseInt(request.getParameter("id"));
+		laptopService.deleteLaptop(pId);
+		return new ModelAndView("redirect:/Product/laptop");
+	}
+	@RequestMapping(value = "/newMobile", method = RequestMethod.GET)
+	public ModelAndView newMobile(ModelAndView model) {
+		Mobile mobile = new Mobile();
+		model.addObject("mobile", mobile);
+		model.setViewName("MobileForm");
+		return model;
+	}
+	
+	@RequestMapping(value = "/saveMobile", method = RequestMethod.POST)
+	public ModelAndView saveEmployee(@ModelAttribute Mobile mobile) {
+		if (mobile.getP_Id() == 0) { // if employee id is 0 then creating the
+			// employee other updating the employee
+			mobileService.addMobile(mobile);
+			return new ModelAndView("redirect:/Product/mobile");
+		} else {
+			mobileService.updateMobile(mobile);
+			return new ModelAndView("redirect:/Product/mobile");
+		}
+	}
+	
+	@RequestMapping(value = "/editMobile")
+	public ModelAndView editMobile(HttpServletRequest request) {
+		int pId = Integer.parseInt(request.getParameter("id"));
+		Mobile mobile = mobileService.getMobile(pId);
+		ModelAndView model = new ModelAndView("MobileForm");
+		model.addObject("mobile", mobile);
+
+		return model;
+	}
+	
+	@RequestMapping(value = "/deleteMobile")
+	public ModelAndView deleteMobile(HttpServletRequest request) {
+		int pId = Integer.parseInt(request.getParameter("id"));
+		mobileService.deleteMobile(pId);
+		return new ModelAndView("redirect:/Product/mobile");
+	}
+	
+	@RequestMapping(value = "/newSmartWatch", method = RequestMethod.GET)
+	public ModelAndView newSmartWatch(ModelAndView model) {
+		SmartWatch smartwatch = new SmartWatch();
+		model.addObject("smartwatch", smartwatch);
+		model.setViewName("SmartWatchForm");
+		return model;
+	}
+	
+	@RequestMapping(value = "/saveSmartWatch", method = RequestMethod.POST)
+	public ModelAndView saveSmartWatch(@ModelAttribute SmartWatch smartwatch) {
+		if (smartwatch.getP_Id() == 0) { // if employee id is 0 then creating the
+			// employee other updating the employee
+			smartwatchService.addSmartWatch(smartwatch);
+			return new ModelAndView("redirect:/Product/smartwatch");
+		} else {
+			smartwatchService.updateSmartWatch(smartwatch);
+			return new ModelAndView("redirect:/Product/smartwatch");
+		}
+	}
+	
+	@RequestMapping(value = "/editSmartWatch")
+	public ModelAndView editSmartWatch(HttpServletRequest request) {
+		int pId = Integer.parseInt(request.getParameter("id"));
+		SmartWatch smartwatch = smartwatchService.getSmartWatch(pId);
+		ModelAndView model = new ModelAndView("SmartWatchForm");
+		model.addObject("smartwatch", smartwatch);
+
+		return model;
+	}
+	
+	@RequestMapping(value = "/deleteSmartWatch")
+	public ModelAndView deleteSmartWatch(HttpServletRequest request) {
+		int pId = Integer.parseInt(request.getParameter("id"));
+		smartwatchService.deleteSmartWatch(pId);
+		return new ModelAndView("redirect:/Product/smartwatch");
+	}
+	@RequestMapping(value = "/newTV", method = RequestMethod.GET)
+	public ModelAndView newTV(ModelAndView model) {
+		TV tv = new TV();
+		model.addObject("tv", tv);
+		model.setViewName("TVForm");
+		return model;
+	}
+	
+	@RequestMapping(value = "/saveTV", method = RequestMethod.POST)
+	public ModelAndView saveTablet(@ModelAttribute TV tv) {
+		if (tv.getP_Id() == 0) { // if employee id is 0 then creating the
+			// employee other updating the employee
+			tvService.addTV(tv);
+			return new ModelAndView("redirect:/Product/tv");
+		} else {
+			tvService.updateTV(tv);
+			return new ModelAndView("redirect:/Product/tv");
+		}
+	}
+	
+	@RequestMapping(value = "/editTV")
+	public ModelAndView editTV(HttpServletRequest request) {
+		int pId = Integer.parseInt(request.getParameter("id"));
+		TV tv = tvService.getTV(pId);
+		ModelAndView model = new ModelAndView("TVForm");
+		model.addObject("tv", tv);
+
+		return model;
+	}
+	
+	@RequestMapping(value = "/deleteTV")
+	public ModelAndView deleteTV(HttpServletRequest request) {
+		int pId = Integer.parseInt(request.getParameter("id"));
+		tvService.deleteTV(pId);
+		return new ModelAndView("redirect:/Product/tv");
+	}
+	
+	@RequestMapping(value = "/singleProduct")
+	public ModelAndView singleProduct(@RequestParam("pid") int pid, ModelAndView model, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		if(session.getAttribute("uid") == null) {
+			return new ModelAndView("redirect:/");
+		}
+		else {
+			String type = productService.getProduct(pid).getP_Type();
+			
+			if(type.equalsIgnoreCase("laptop")) {
+				Laptop laptop = laptopService.getLaptop(pid);
+				model.addObject(laptop);
+				model.setViewName("singleLaptop");
+			}
+			else if(type.equalsIgnoreCase("mobile")) {
+				Mobile mobile = mobileService.getMobile(pid);
+				model.addObject(mobile);
+				model.setViewName("singleMobile");
+			}
+			else if(type.equalsIgnoreCase("smartWatch")) {
+				SmartWatch smartWatch = smartwatchService.getSmartWatch(pid);
+				model.addObject(smartWatch);
+				model.setViewName("singleSmartWatch");
+			}
+			else if(type.equalsIgnoreCase("tv")) {
+				TV TV = tvService.getTV(pid);
+				model.addObject(TV);
+				model.setViewName("singleTV");
+			}
+			return model;
+		}
+	}
+}
